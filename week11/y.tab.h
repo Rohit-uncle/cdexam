@@ -1,0 +1,14 @@
+#define SPACE 257
+#define KEY 258
+#define NL 259
+#define SEMI 260
+#define COM 261
+#define END 262
+#define OPPR 263
+#define CLPR 264
+#define ID 265
+#define CPR 266
+#define CHARAC 267
+#define VOID 268
+#define OPR 269
+#define UN 270

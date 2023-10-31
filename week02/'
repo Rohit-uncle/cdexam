@@ -1,0 +1,33 @@
+%option noyywrap
+%{
+#include<stdio.h>
+#include<string.h>
+
+char replace_with[100];
+char replace[100];
+
+
+%}
+%%
+.    { if(strcmp(yytext, replace)==0)				
+		 	fprintf(yyout, "%s", replace_with);
+			else
+				fprintf(yyout, "%s", yytext);}
+%%
+
+
+
+
+int main()
+{
+		extern FILE *yyin, *yyout;
+	printf("Enter the string that is to be replaced: ");
+	fgets(replace,100,stdin);
+	printf("Enter the string to be replaced: ");
+	fgets(replace_with,100,stdin);
+	yyin=fopen("input.txt", "r");
+	yyout=fopen("output.txt", "w");
+
+		yylex();
+
+}

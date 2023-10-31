@@ -1,0 +1,21 @@
+
+ption noyywrap
+
+%{
+#include <stdio.h>
+#include <string.h>
+
+%}
+
+%%
+[a-b]*[A-Z]+  printf("%s\n",yytext);
+%%
+
+int main()
+{
+        FILE *fp = fopen("ipd.txt", "r");
+        if(fp)
+                yyin = fp;
+        printf("reverse of the strings : \n");
+        yylex();
+}
