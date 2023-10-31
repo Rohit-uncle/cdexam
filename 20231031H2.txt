@@ -1,0 +1,190 @@
+NESTED FOR LOOP 
+LEX FILE
+%%
+
+[ \t\n] ;
+for     return FOR;
+[a-zA-Z][_a-zA-Z0-9]* return ID;
+[0-9]+  return NUMBER;
+"!"     return NOT;
+"&&"    return AND;
+"||"    return OR;
+">"     return GT;
+"<"     return LT;
+"=="    return EQ;
+"!="    return NE;
+">="    return GE;
+"<="    return LE;
+"+"     return ADD;
+"-"     return SUB;
+"="     return EQU;
+"*"     return MUL;
+"/"     return DIV;
+";"     return SC;
+"{"     return OB;
+"}"     return CB;
+"("     return OP;
+")"     return CP;
+"++"    return INCR;
+"--"    return DECR;
+
+%%
+-----------------
+YACC FILE
+%{
+        #include<stdio.h>
+%}
+
+%token NUMBER ID FOR AND OR NOT LT GT LE GE EQ NE ADD SUB EQU MUL DIV SC OB CB OP CP INCR DECR
+
+%%
+start: for {printf("Valid\n");}
+for: FOR OP init SC cond SC inc CP body { };
+body: OB stmts CB |
+      stmt SC ;
+stmts:  stmt SC stmts |
+        stmt SC |
+        for ;
+init:   stmt |
+        ;
+cond:   c AND cond |
+        c OR cond |
+        c ;
+c:      f relop f |
+        NOT f relop f ;
+inc:    ID INCR |
+        ID DECR |
+        stmt |
+        ;
+stmt:   ID EQU expr;
+    expr:       expr ADD term |
+        expr SUB term |
+        term;
+term:   term MUL f |
+        term DIV f |
+        f;
+f:      ID |
+        NUMBER;
+relop:  LT | GT | LE | GE | EQ | NE;
+
+
+%%
+
+#include"lex.yy.c"
+
+void yyerror(const char *str) {
+        printf("Error : %s\n", str);
+}
+
+int main(int argc, char *argv[]) {
+    yyin = fopen(argv[1], "r");
+    yyparse();
+    fclose(yyin);
+}
+
+int yywrap(){
+        return 1;
+}
+----------------------------------
+TEXT FILE
+for(a=0;a<5;a++)
+{
+for(b=0;b<5;b++)
+{
+for(c=0;c<5;c++)
+{
+k=5;
+}
+}
+}
+------------------------------------
+WHILE LOOP VALIDATION
+LEX FILE
+%%
+
+[ \t\n] ;
+while   return WHILE;
+[a-zA-Z][_a-zA-Z0-9]* return ID;
+[0-9]+  return NUMBER;
+":"     return C;
+"!"     return NOT;
+"&&"    return AND;
+"||"    return OR;
+">"     return GT;
+"<"     return LT;
+"=="    return EQ;
+"!="    return NE;
+">="    return GE;
+"<="    return LE;
+"+"     return ADD;
+"-"     return SUB;
+"="     return EQU;
+"*"     return MUL;
+"/"     return DIV;
+";"     return SC;
+"{"     return OB;
+"}"     return CB;
+"("     return OP;
+")"     return CP;
+"++"    return INCR;
+"--"    return DECR;
+
+%%
+---------------------------------
+YACC FILE
+%{
+        #include<stdio.h>
+%}
+
+%token NUMBER ID WHILE AND OR NOT LT GT LE GE EQ NE ADD SUB EQU MUL DIV SC C OB CB OP CP INCR DECR
+
+%%
+start: while {printf("Vaild\n");}
+while:  WHILE OP cond CP body {  } ;
+body: OB stmts CB |
+      stmt SC ;
+stmts:  stmt SC stmts |
+        stmt SC |
+        while ;
+stmt:   ID EQU expr;
+cond:   c AND cond |
+        c OR cond |
+        c ;
+c:      f relop f |
+        NOT f relop f ;
+relop:  LT | GT | LE | GE | EQ | NE;
+
+expr:   expr ADD term |
+        expr SUB term |
+        term;
+term:   term MUL f |
+        term DIV f |
+        f;
+f:      ID |
+        NUMBER;
+
+%%
+
+#include"lex.yy.c"
+
+void yyerror(const char *str) {
+        printf("Error : %s\n ", str);
+}
+
+int main(int argc, char *argv[]) {
+    yyin = fopen(argv[1], "r");
+    yyparse();
+    fclose(yyin);
+}
+
+int yywrap(){
+        return 1;
+}
+-------------------------------------
+TEXT FILE
+while(i<10){
+        x=5;
+        while(j<5){
+                y=10;
+        }
+}
