@@ -1,3 +1,8 @@
+lex file.l
+yacc  file.yacc
+g++ y.tab.c
+./a.out
+
 NESTED FOR LOOP 
 LEX FILE
 %%
