@@ -1,0 +1,205 @@
+POSTFIX 
+%{
+#include "y.tab.h"
+#include <stdio.h>
+extern int yylval;
+%}
+
+%%
+[a-zA-Z] {yylval = strdup(yytext); return VAR;}
+[0-9]+   { yylval = atoi(yytext); return NUMBER; }
+[-+*/()] { return *yytext; }
+[ \t]    ; // Skip whitespace
+\n       return '\n';
+.        ; // Ignore other characters
+
+%%
+int yywrap(){
+        return 1;
+}
+---
+%{
+#include <stdio.h>
+%}
+
+%token NUMBER VAR
+%left '+' '-'
+%left '*' '/'
+%left UMINUS
+
+%%
+input: input line
+     |
+        ;
+line: expr '\n'   { printf("%s\n", $1); free($1); }
+    ;
+
+expr: VAR {$$ = strdup($1);}
+    | NUMBER    { $$ = malloc(12); sprintf($$, "%d", $1); }
+    | expr '+' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "%s %s +", $1, $3);
+        free($1);
+        free($3);
+    }
+    | expr '-' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "%s %s -", $1, $3);
+        free($1);
+        free($3);
+    }
+    | expr '*' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "%s %s *", $1, $3);
+        free($1);
+        free($3);
+    }
+    | expr '/' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "%s %s /", $1, $3);
+        free($1);
+        free($3);
+    }
+    | '-' expr %prec UMINUS {
+        $$ = malloc(strlen($2) + 3);
+        sprintf($$, "%s _", $2);
+        free($2);
+    }
+    | '(' expr ')'    { $$ = $2; }
+    ;
+
+%%
+
+int main() {
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *s){
+        printf("%s\n", s);
+        return 0;
+}
+--
+EVALUATION
+%{#include<stdio.h>
+#include<ctype.h>
+%}
+%token num
+%left '+''-'
+%left '*' '/'
+%right '^'
+%%
+s:e'\n'{printf("\n%d",$1);}
+e:e e'+'{$$=$1+$2;}
+|e e'-'{$$=$1-$2;}
+|e e'*'{$$=$1*$2;}
+|e e'/'{$$=$1/$2;}
+|num
+;
+%%
+yylex()
+{
+int c;
+c=getchar();
+if(isdigit(c))
+{ yylval=c-'0';
+ return num;
+}return c;
+}
+int main()
+{
+ yyparse();
+return 1;
+}
+int yyerror()
+{
+return 1;
+}
+int yywrap()
+{
+ return 1;
+}
+
+--------------------------------------
+PREFIX
+%{
+#include "y.tab.h"
+#include <stdio.h>
+extern int yylval;
+%}
+
+%%
+[a-zA-Z] {yylval = strdup(yytext); return VAR;}
+[0-9]+   { yylval = atoi(yytext); return NUMBER; }
+[-+*/()] { return *yytext; }
+[ \t]    ; // Skip whitespace
+\n       return '\n';
+.        ; // Ignore other characters
+
+%%
+int yywrap(){
+        return 1;
+}
+--
+%{
+#include <stdio.h>
+%}
+
+%token NUMBER VAR
+%left '+' '-'
+%left '*' '/'
+%left UMINUS
+
+%%
+input: input line
+     |
+        ;
+line: expr '\n'   { printf("%s\n", $1); free($1); }
+    ;
+
+expr: VAR {$$ = strdup($1);}
+    | NUMBER    { $$ = malloc(12); sprintf($$, "%d", $1); }
+    | expr '+' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "+ %s %s", $1, $3);
+        free($1);
+        free($3);
+    }
+    | expr '-' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "- %s %s", $1, $3);
+        free($1);
+        free($3);
+    }
+    | expr '*' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "* %s %s", $1, $3);
+        free($1);
+        free($3);
+    }
+    | expr '/' expr   {
+        $$ = malloc(strlen($1) + strlen($3) + 3);
+        sprintf($$, "/ %s %s", $1, $3);
+        free($1);
+        free($3);
+    }
+    | '-' expr %prec UMINUS {
+        $$ = malloc(strlen($2) + 3);
+        sprintf($$, "- %s", $2);
+        free($2);
+    }
+    | '(' expr ')'    { $$ = $2; }
+    ;
+
+%%
+
+int main() {
+    yyparse();
+    return 0;
+}
+
+int yyerror(char *s){
+        printf("%s\n", s);
+        return 0;
+}
+---------------------------------

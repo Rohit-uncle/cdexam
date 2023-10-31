@@ -1,0 +1,121 @@
+if to switch(ol)
+
+%option noyywrap
+
+%{
+        #include<stdio.h>
+        #include<string.h>
+%}
+
+%%
+
+"if" {printf("case");}
+"else if"       {printf("case");}
+"else"  {printf("default");}
+[(].[)] {printf(" %s",yytext);}
+"{"     {printf(":");}
+.[;]$ {printf("%s",yytext);}
+[}]   {printf("break;\n");}
+\n {printf("\n");
+}
+
+
+%%
+
+int main()
+{
+        extern FILE *yyin,*yyout;
+        yyin = fopen("if_switch.txt","r");
+        printf("switch(true)\n{\n");
+        yylex();
+	printf("}\n");
+        return 0;
+}
+
+text.file
+
+if(i==2) {
+i++;
+c=2+1;
+}
+else if(i<2) {
+c=c+2;
+i--;
+}
+else {
+i=0;
+}
+
+______________________________________________________________________________
+
+while val(l)
+
+%option noyywrap
+
+%{
+#include<stdio.h>
+#include<stdlib.h>
+#include "y.tab.h"
+%}
+
+al	[a-zA-Z]
+dig	[0-9]
+
+%%
+" "	return SPACE;
+while	return WHILE;
+[(]	return PARS;
+[)]	return PARE;
+{al}({al}|{dig})*	return ID;
+{dig}*	return NUM;
+"<="|">="|"=="|"!="	return RELOP;
+"+"|"-"|"*"|"/"	return OP;
+=	return ASSGN;
+\n	return NL;
+[{]	return CURS;
+[}]	return CURE;
+[;]	return SEMI;
+%%
+
+void yyerror(char *str) {
+	printf("Invalid\n");
+}
+
+int main() {
+FILE* fp = fopen("while.txt","r");
+yyin = fp;
+yyparse();
+return 1;
+}
+
+while val(y)
+
+%{
+#include<stdio.h>
+#include<stdlib.h>
+int yylex();
+extern int yyin;
+%}
+
+%token WHILE PARS PARE ID NUM RELOP OP ASSGN NL SPACE CURS CURE SEMI
+
+%%
+stmt : WHILE PARS para_stmt PARE NL CURS NL in_stmt CURE	{printf("Valid!\n");exit(0);};
+
+para_stmt : ID RELOP ID
+	  | ID RELOP NUM
+	  | NUM RELOP ID
+	  | NUM RELOP NUM
+	;
+in_stmt : ID ASSGN ID OP NUM SEMI NL;
+%%
+
+
+text
+
+while(i<=2)
+{
+i=i+2;
+}
+
+
